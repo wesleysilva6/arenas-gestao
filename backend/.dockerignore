@@ -1,0 +1,17 @@
+# Diretórios de controle de versão
+.git/
+.gitignore
+
+# Configurações de desenvolvimento
+.devops/
+.vscode/
+.idea/
+
+# Arquivos sensíveis
+.env
+config/*.json
+
+# Logs e caches
+*.log
+debug/
+.tmp/

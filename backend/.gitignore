@@ -1,0 +1,7 @@
+.env
+.env.prod
+vendor
+/logs
+/core
+core
+banco.sql

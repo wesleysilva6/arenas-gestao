@@ -1,0 +1,14 @@
+services:
+  frontend:
+    build:
+      context: .
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./.env
+    networks:
+      - poc-network
+
+networks:
+  poc-network:
+    driver: bridge

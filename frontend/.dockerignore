@@ -1,0 +1,17 @@
+# Diretórios de controle de versão
+git/
+.gitignore
+
+# Configurações de desenvolvimento
+.devops/
+.vscode/
+.idea/
+
+# .env - COMENTADO pois precisa ser copiado para o Vite ler durante o build
+# .env
+config/*.json
+
+# Logs e caches
+*.log
+debug/
+.tmp/
