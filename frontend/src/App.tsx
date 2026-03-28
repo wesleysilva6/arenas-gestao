@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/login/Login';
 import ProtectedLayout from './ProtectedLayout';
+import Dashboard from './pages/dashboard/Index';
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
 
         {/* ROTAS PROTEGIDAS */}
         <Route element={<ProtectedLayout />}>
-          <Route path="/dashboard" element={<div>Dashboard</div>} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Route>
       </Routes>
     </Router>

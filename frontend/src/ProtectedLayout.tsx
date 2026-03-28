@@ -1,20 +1,29 @@
-import { Box } from '@chakra-ui/react';
-import { Outlet, Navigate } from "react-router-dom";
+import { useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { getToken, isTokenValid } from './service/http';
+import { AuthProvider } from './contexts/AuthContext';
+import AppLayout from './components/AppLayout';
 
-export default function ProtectedLayout(){
+export default function ProtectedLayout() {
+  const navigate = useNavigate();
+
   const token = getToken();
-  const isAuthenticated = !!token && isTokenValid();
+  const isAuthenticated = !!(token && token.trim().length > 0) && isTokenValid();
+
+  // Garantia extra: navega programaticamente caso o <Navigate> não dispare
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  return(
-    <Box display="flex" w="100%" h="100vh">
-      <Box flex="1" overflow="auto">
-        <Outlet/>
-      </Box>
-    </Box>
+  return (
+    <AuthProvider>
+      <AppLayout />
+    </AuthProvider>
   );
 }
