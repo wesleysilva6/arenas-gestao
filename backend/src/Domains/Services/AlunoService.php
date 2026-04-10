@@ -1,0 +1,130 @@
+<?php
+
+namespace App\Domains\Services;
+
+use App\Domains\Repositories\AlunoRepository;
+
+class AlunoService
+{
+    public static function listar(): array
+    {
+        return AlunoRepository::listar();
+    }
+
+    public static function buscar(int $idaluno): ?object
+    {
+        return AlunoRepository::buscar($idaluno);
+    }
+
+    public static function cadastrar(array $dados): array
+    {
+        $result = AlunoRepository::cadastrar([
+            'nome' => $dados['nome'],
+            'telefone' => $dados['telefone'],
+            'modalidade_id' => (int) $dados['modalidade_id'],
+            'data_inicio' => $dados['data_inicio'] ?? null,
+            'dia_vencimento' => (int) $dados['dia_vencimento'],
+            'notificacao_whatsapp' => (int) ($dados['notificacao_whatsapp'] ?? 1),
+            'situacao' => (int) ($dados['situacao'] ?? 1),
+            'observacao' => $dados['observacao'] ?? null,
+            'valor_mensalidade' => (float) ($dados['valor_mensalidade'] ?? 0),
+            'plano' => $dados['plano'] ?? 'mensal',
+            'data_inicio_contrato' => $dados['data_inicio_contrato'] ?? null,
+            'data_vencimento_contrato' => $dados['data_vencimento_contrato'] ?? null,
+        ]);
+
+        if (!empty($result) && isset($result[0]['idaluno'])) {
+            $alunoId = (int) $result[0]['idaluno'];
+            self::gerarMensalidades(
+                $alunoId,
+                $dados['plano'] ?? 'mensal',
+                (float) ($dados['valor_mensalidade'] ?? 0),
+                (int) $dados['dia_vencimento'],
+                $dados['data_inicio_contrato'] ?? null
+            );
+        }
+
+        return $result;
+    }
+
+    public static function editar(int $idaluno, array $dados): array
+    {
+        $result = AlunoRepository::editar([
+            'idaluno' => $idaluno,
+            'nome' => $dados['nome'],
+            'telefone' => $dados['telefone'],
+            'modalidade_id' => (int) $dados['modalidade_id'],
+            'data_inicio' => $dados['data_inicio'] ?? null,
+            'dia_vencimento' => (int) $dados['dia_vencimento'],
+            'notificacao_whatsapp' => (int) ($dados['notificacao_whatsapp'] ?? 1),
+            'situacao' => (int) ($dados['situacao'] ?? 1),
+            'observacao' => $dados['observacao'] ?? null,
+            'valor_mensalidade' => (float) ($dados['valor_mensalidade'] ?? 0),
+            'plano' => $dados['plano'] ?? 'mensal',
+            'data_inicio_contrato' => $dados['data_inicio_contrato'] ?? null,
+            'data_vencimento_contrato' => $dados['data_vencimento_contrato'] ?? null,
+        ]);
+
+        AlunoRepository::limparMensalidadesPendentes($idaluno);
+        self::gerarMensalidades(
+            $idaluno,
+            $dados['plano'] ?? 'mensal',
+            (float) ($dados['valor_mensalidade'] ?? 0),
+            (int) $dados['dia_vencimento'],
+            $dados['data_inicio_contrato'] ?? null
+        );
+
+        return $result;
+    }
+
+    public static function deletar(int $idaluno): array
+    {
+        return AlunoRepository::deletar($idaluno);
+    }
+
+    public static function listarModalidades(): array
+    {
+        return AlunoRepository::listarModalidades();
+    }
+
+    public static function cancelar(int $idaluno): array
+    {
+        AlunoRepository::cancelarMensalidades($idaluno);
+        return AlunoRepository::cancelar($idaluno);
+    }
+
+    private static function gerarMensalidades(int $alunoId, string $plano, float $valor, int $diaVencimento, ?string $dataInicioContrato): void
+    {
+        $mesesPorPlano = [
+            'mensal' => 1,
+            'trimestral' => 3,
+            'semestral' => 6,
+            'anual' => 12,
+        ];
+
+        $totalMeses = $mesesPorPlano[$plano] ?? 1;
+
+        $inicio = $dataInicioContrato ? new \DateTime($dataInicioContrato) : new \DateTime();
+
+        for ($i = 0; $i < $totalMeses; $i++) {
+            $mesReferencia = clone $inicio;
+            $mesReferencia->modify("+{$i} months");
+
+            $ano = (int) $mesReferencia->format('Y');
+            $mes = (int) $mesReferencia->format('m');
+
+            $ultimoDiaMes = (int) (new \DateTime("{$ano}-{$mes}-01"))->format('t');
+            $dia = min($diaVencimento, $ultimoDiaMes);
+
+            $dataVencimento = sprintf('%04d-%02d-%02d', $ano, $mes, $dia);
+            $mesRef = sprintf('%04d-%02d', $ano, $mes);
+
+            AlunoRepository::gerarMensalidade([
+                'aluno_id' => $alunoId,
+                'valor' => $valor,
+                'mes_referencia' => $mesRef,
+                'data_vencimento' => $dataVencimento,
+            ]);
+        }
+    }
+}

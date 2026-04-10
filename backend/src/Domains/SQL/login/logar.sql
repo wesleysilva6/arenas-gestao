@@ -2,7 +2,7 @@ SELECT
     idusuario,
     nome,
     email,
-    senha_hash,
+    senha,
     situacao
 FROM usuario 
 WHERE email = :email

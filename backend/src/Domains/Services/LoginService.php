@@ -25,7 +25,7 @@ class LoginService
         }
         
         // Verificar senha
-        if (!password_verify($senha, $usuario->senha_hash)) {
+        if (!password_verify($senha, $usuario->senha)) {
             throw new Exception('Email ou senha inválidos');
         }
         
