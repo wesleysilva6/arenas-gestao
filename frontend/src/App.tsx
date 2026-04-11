@@ -4,6 +4,10 @@ import ProtectedLayout from './ProtectedLayout';
 import Dashboard from './pages/dashboard/Index';
 import Alunos from './pages/alunos/Index';
 import Modalidades from './pages/modalidades/Index';
+import Turmas from './pages/turmas/Index';
+import Mensalidades from './pages/mensalidades/Index';
+import Presencas from './pages/presencas/Index';
+import Mensagens from './pages/mensagens/Index';
 
 function App() {
   return (
@@ -18,6 +22,10 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/alunos" element={<Alunos />} />
           <Route path="/modalidades" element={<Modalidades />} />
+          <Route path="/turmas" element={<Turmas />} />
+          <Route path="/mensalidades" element={<Mensalidades />} />
+          <Route path="/presencas" element={<Presencas />} />
+          <Route path="/mensagens" element={<Mensagens />} />
         </Route>
       </Routes>
     </Router>

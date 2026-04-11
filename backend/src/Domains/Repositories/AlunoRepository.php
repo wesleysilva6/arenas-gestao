@@ -75,4 +75,11 @@ class AlunoRepository
         $res = Database::switchParams($params, 'aluno/limpar_mensalidades_pendentes', true);
         return $res['retorno'] ?? [];
     }
+
+    public static function listarTurmas(int $idaluno): array
+    {
+        $params = ['idaluno' => $idaluno];
+        $res = Database::switchParams($params, 'aluno/listar_turmas', true);
+        return $res['retorno'] ?? [];
+    }
 }

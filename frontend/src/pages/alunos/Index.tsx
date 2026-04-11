@@ -1,18 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   Box,
   Button,
   Flex,
-  Heading,
   HStack,
   Icon,
+  IconButton,
   Input,
   InputGroup,
   InputLeftElement,
+  Select,
+  Tooltip,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react'
-import { FiPlus, FiSearch, FiUsers } from 'react-icons/fi'
+import { FiPlus, FiRefreshCw, FiSearch } from 'react-icons/fi'
 
 import {
   listarAlunos,
@@ -29,6 +31,9 @@ import TabelaAlunos from './components/TabelaAlunos'
 import ModalAluno from './components/ModalAluno'
 import ConfirmarExclusao from './components/ConfirmarExclusao'
 import ConfirmarCancelamento from './components/ConfirmarCancelamento'
+import ResumoCards from './components/ResumoCards'
+import ModalTurmasAluno from './components/ModalTurmasAluno'
+import ModalPresencasAluno from './components/ModalPresencasAluno'
 
 export default function Alunos() {
   const [alunos, setAlunos] = useState<Aluno[]>([])
@@ -38,14 +43,18 @@ export default function Alunos() {
   const [deletando, setDeletando] = useState(false)
   const [cancelando, setCancelando] = useState(false)
   const [busca, setBusca] = useState('')
+  const [filtroSituacao, setFiltroSituacao] = useState('')
+  const [filtroModalidade, setFiltroModalidade] = useState('')
   const [alunoSelecionado, setAlunoSelecionado] = useState<Aluno | null>(null)
 
   const modalForm = useDisclosure()
   const modalExclusao = useDisclosure()
   const modalCancelamento = useDisclosure()
+  const modalTurmas = useDisclosure()
+  const modalPresencas = useDisclosure()
   const toast = useToast()
 
-  async function carregarDados() {
+  const carregarDados = useCallback(async () => {
     try {
       setLoading(true)
       const [alunosData, modalidadesData] = await Promise.all([
@@ -59,17 +68,21 @@ export default function Alunos() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     carregarDados()
-  }, [])
+  }, [carregarDados])
 
-  const alunosFiltrados = alunos.filter((a) =>
-    a.nome.toLowerCase().includes(busca.toLowerCase()) ||
-    a.telefone.includes(busca) ||
-    a.modalidade_nome.toLowerCase().includes(busca.toLowerCase())
-  )
+  const alunosFiltrados = alunos.filter((a) => {
+    const matchBusca =
+      a.nome.toLowerCase().includes(busca.toLowerCase()) ||
+      a.telefone.includes(busca) ||
+      a.modalidade_nome.toLowerCase().includes(busca.toLowerCase())
+    const matchSituacao = filtroSituacao === '' || String(a.situacao) === filtroSituacao
+    const matchModalidade = filtroModalidade === '' || String(a.modalidade_id) === filtroModalidade
+    return matchBusca && matchSituacao && matchModalidade
+  })
 
   function handleNovo() {
     setAlunoSelecionado(null)
@@ -89,6 +102,16 @@ export default function Alunos() {
   function handleCancelar(aluno: Aluno) {
     setAlunoSelecionado(aluno)
     modalCancelamento.onOpen()
+  }
+
+  function handleVerTurmas(aluno: Aluno) {
+    setAlunoSelecionado(aluno)
+    modalTurmas.onOpen()
+  }
+
+  function handleVerPresencas(aluno: Aluno) {
+    setAlunoSelecionado(aluno)
+    modalPresencas.onOpen()
   }
 
   async function handleConfirmarCancelamento() {
@@ -142,21 +165,29 @@ export default function Alunos() {
     }
   }
 
+  const totalAtivos = alunos.filter((a) => a.situacao === 1).length
+  const totalInativos = alunos.filter((a) => a.situacao !== 1).length
+
   return (
     <Box p={{ base: 4, md: 6, lg: 8 }} maxW="1400px" w="full" mx="auto">
-      {/* Header */}
-      <Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={4}>
-        <HStack spacing={3}>
-          <Flex w={10} h={10} rounded="xl" bg="brand.50" align="center" justify="center">
-            <Icon as={FiUsers} boxSize={5} color="brand.500" />
-          </Flex>
-          <Heading size="lg" color="gray.800" fontWeight="700">
-            Alunos
-          </Heading>
-        </HStack>
+      <ResumoCards total={alunos.length} ativos={totalAtivos} inativos={totalInativos} />
 
-        <HStack spacing={3}>
-          <InputGroup maxW="300px">
+      {/* Toolbar */}
+      <Flex
+        bg="white"
+        rounded="2xl"
+        shadow="sm"
+        border="1px solid"
+        borderColor="gray.100"
+        p={4}
+        mb={5}
+        gap={3}
+        direction={{ base: 'column', md: 'row' }}
+        align={{ base: 'stretch', md: 'center' }}
+        justify="space-between"
+      >
+        <HStack spacing={3} flex={1}>
+          <InputGroup maxW={{ md: '300px' }}>
             <InputLeftElement pointerEvents="none">
               <Icon as={FiSearch} color="gray.400" />
             </InputLeftElement>
@@ -164,20 +195,62 @@ export default function Alunos() {
               placeholder="Buscar aluno..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              bg="white"
               rounded="xl"
+              bg="gray.50"
               border="1px solid"
               borderColor="gray.200"
+              _focus={{ bg: 'white', borderColor: 'brand.500' }}
             />
           </InputGroup>
 
-          <Button
-            leftIcon={<FiPlus />}
-            colorScheme="brand"
+          <Select
+            placeholder="Todos os status"
+            value={filtroSituacao}
+            onChange={(e) => setFiltroSituacao(e.target.value)}
+            maxW="180px"
             rounded="xl"
-            onClick={handleNovo}
-            px={6}
+            bg="gray.50"
+            border="1px solid"
+            borderColor="gray.200"
+            _focus={{ bg: 'white', borderColor: 'brand.500' }}
+            display={{ base: 'none', md: 'block' }}
           >
+            <option value="1">Ativos</option>
+            <option value="0">Inativos</option>
+          </Select>
+
+          <Select
+            placeholder="Todas modalidades"
+            value={filtroModalidade}
+            onChange={(e) => setFiltroModalidade(e.target.value)}
+            maxW="200px"
+            rounded="xl"
+            bg="gray.50"
+            border="1px solid"
+            borderColor="gray.200"
+            _focus={{ bg: 'white', borderColor: 'brand.500' }}
+            display={{ base: 'none', md: 'block' }}
+          >
+            {modalidades.map((m) => (
+              <option key={m.idmodalidade} value={m.idmodalidade}>
+                {m.nome}
+              </option>
+            ))}
+          </Select>
+        </HStack>
+
+        <HStack spacing={2}>
+          <Tooltip label="Atualizar">
+            <IconButton
+              aria-label="Atualizar"
+              icon={<FiRefreshCw />}
+              variant="ghost"
+              rounded="xl"
+              color="gray.500"
+              onClick={() => carregarDados()}
+            />
+          </Tooltip>
+          <Button leftIcon={<FiPlus />} colorScheme="brand" rounded="xl" onClick={handleNovo} px={6}>
             Novo Aluno
           </Button>
         </HStack>
@@ -190,6 +263,8 @@ export default function Alunos() {
         onEditar={handleEditar}
         onDeletar={handleDeletar}
         onCancelar={handleCancelar}
+        onVerTurmas={handleVerTurmas}
+        onVerPresencas={handleVerPresencas}
       />
 
       {/* Modal Formulário */}
@@ -219,6 +294,21 @@ export default function Alunos() {
         aluno={alunoSelecionado}
         cancelando={cancelando}
       />
+
+      {/* Modal Turmas do Aluno */}
+      <ModalTurmasAluno
+        isOpen={modalTurmas.isOpen}
+        onClose={modalTurmas.onClose}
+        aluno={alunoSelecionado}
+      />
+
+      {/* Modal Presenças do Aluno */}
+      <ModalPresencasAluno
+        isOpen={modalPresencas.isOpen}
+        onClose={modalPresencas.onClose}
+        aluno={alunoSelecionado}
+      />
     </Box>
   )
 }
+

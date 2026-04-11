@@ -102,4 +102,15 @@ class AlunoController extends ControllerBase
             return $this->errorResponse($response, $e->getMessage(), 500);
         }
     }
+
+    public function listarTurmas(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $idaluno = (int) ($args['id'] ?? 0);
+            $data = AlunoService::listarTurmas($idaluno);
+            return $this->jsonResponse($response, ['success' => true, 'data' => $data]);
+        } catch (Exception $e) {
+            return $this->errorResponse($response, $e->getMessage(), 500);
+        }
+    }
 }

@@ -15,7 +15,7 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react'
-import { FiEdit2, FiTrash2, FiUsers, FiXCircle } from 'react-icons/fi'
+import { FiEdit2, FiBarChart2, FiLayers, FiTrash2, FiUsers, FiXCircle } from 'react-icons/fi'
 import { formatCurrency } from '../../../utils/formatters'
 import type { Aluno } from '../../../service/alunos'
 
@@ -25,9 +25,11 @@ interface Props {
   onEditar: (aluno: Aluno) => void
   onDeletar: (aluno: Aluno) => void
   onCancelar: (aluno: Aluno) => void
+  onVerTurmas: (aluno: Aluno) => void
+  onVerPresencas: (aluno: Aluno) => void
 }
 
-export default function TabelaAlunos({ alunos, loading, onEditar, onDeletar, onCancelar }: Props) {
+export default function TabelaAlunos({ alunos, loading, onEditar, onDeletar, onCancelar, onVerTurmas, onVerPresencas }: Props) {
   if (loading) {
     return (
       <Box bg="white" rounded="2xl" shadow="sm" border="1px solid" borderColor="gray.100" p={6}>
@@ -116,6 +118,22 @@ export default function TabelaAlunos({ alunos, loading, onEditar, onDeletar, onC
               </Td>
               <Td>
                 <HStack spacing={1} justify="center">
+                  <IconButton
+                    aria-label="Ver Presenças"
+                    icon={<FiBarChart2 />}
+                    size="sm"
+                    variant="ghost"
+                    colorScheme="green"
+                    onClick={() => onVerPresencas(aluno)}
+                  />
+                  <IconButton
+                    aria-label="Ver Turmas"
+                    icon={<FiLayers />}
+                    size="sm"
+                    variant="ghost"
+                    colorScheme="purple"
+                    onClick={() => onVerTurmas(aluno)}
+                  />
                   <IconButton
                     aria-label="Editar"
                     icon={<FiEdit2 />}

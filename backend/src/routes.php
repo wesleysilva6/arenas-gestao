@@ -7,6 +7,10 @@ use App\Controllers\LoginController;
 use App\Controllers\DashboardController;
 use App\Controllers\AlunoController;
 use App\Controllers\ModalidadeController;
+use App\Controllers\TurmaController;
+use App\Controllers\MensalidadeController;
+use App\Controllers\PresencaController;
+use App\Controllers\MensagemController;
 use App\Infrastructures\Middleware\JwtAuthMiddleware;
 
 // Rotas Públicas (sem autenticação)
@@ -25,12 +29,45 @@ $app->group('', function ($group) {
     $group->put('/alunos/{id}', AlunoController::class . ':editar');
     $group->delete('/alunos/{id}', AlunoController::class . ':deletar');
     $group->patch('/alunos/{id}/cancelar', AlunoController::class . ':cancelar');
+    $group->get('/alunos/{id}/turmas', AlunoController::class . ':listarTurmas');
 
     // Modalidades
     $group->get('/modalidades', ModalidadeController::class . ':listar');
     $group->post('/modalidades', ModalidadeController::class . ':cadastrar');
     $group->put('/modalidades/{id}', ModalidadeController::class . ':editar');
     $group->patch('/modalidades/{id}/status', ModalidadeController::class . ':toggleStatus');
+
+    // Turmas
+    $group->get('/turmas', TurmaController::class . ':listar');
+    $group->post('/turmas', TurmaController::class . ':cadastrar');
+    $group->put('/turmas/{id}', TurmaController::class . ':editar');
+    $group->patch('/turmas/{id}/status', TurmaController::class . ':toggleStatus');
+    $group->get('/turmas/{id}/alunos', TurmaController::class . ':listarAlunos');
+    $group->get('/turmas/{id}/alunos-disponiveis', TurmaController::class . ':listarAlunosDisponiveis');
+    $group->post('/turmas/{id}/alunos', TurmaController::class . ':adicionarAluno');
+    $group->delete('/turmas/{id}/alunos/{aluno_id}', TurmaController::class . ':removerAluno');
+
+    // Mensalidades
+    $group->get('/mensalidades', MensalidadeController::class . ':listar');
+    $group->patch('/mensalidades/{id}/confirmar', MensalidadeController::class . ':confirmarPagamento');
+    $group->post('/mensalidades/gerar', MensalidadeController::class . ':gerarMesAtual');
+    $group->get('/mensalidades/sem-mensalidade', MensalidadeController::class . ':contarSemMensalidade');
+
+    // Presenças
+    $group->get('/presencas/turmas', PresencaController::class . ':listar');
+    $group->get('/presencas/aluno/{id}', PresencaController::class . ':listarPorAluno');
+    $group->patch('/presencas/{id}/marcar', PresencaController::class . ':marcar');
+
+    // Mensagens
+    $group->get('/mensagens/historico', MensagemController::class . ':listarHistorico');
+    $group->get('/mensagens/alunos-turma-map', MensagemController::class . ':alunosTurmaMap');
+    $group->post('/mensagens', MensagemController::class . ':cadastrar');
+
+    // Grupos WhatsApp
+    $group->get('/grupos-whatsapp', MensagemController::class . ':listarGrupos');
+    $group->post('/grupos-whatsapp', MensagemController::class . ':cadastrarGrupo');
+    $group->put('/grupos-whatsapp/{id}', MensagemController::class . ':editarGrupo');
+    $group->delete('/grupos-whatsapp/{id}', MensagemController::class . ':deletarGrupo');
 
     // Rotas Procedimento
     $group->get('/procedimento', ProcedimentoController::class . ':Listar');

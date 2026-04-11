@@ -23,6 +23,15 @@ export interface Modalidade {
   nome: string
 }
 
+export interface TurmaDoAluno {
+  idturma: number
+  nome: string
+  horario: string
+  dias_semana: string
+  professor: string
+  modalidade_nome: string
+}
+
 export async function listarAlunos(): Promise<Aluno[]> {
   const res = await http.get('/alunos')
   return res.data?.data ?? []
@@ -55,5 +64,10 @@ export async function cancelarAluno(id: number): Promise<any> {
 
 export async function listarModalidades(): Promise<Modalidade[]> {
   const res = await http.get('/alunos/modalidades')
+  return res.data?.data ?? []
+}
+
+export async function listarTurmasDoAluno(id: number): Promise<TurmaDoAluno[]> {
+  const res = await http.get(`/alunos/${id}/turmas`)
   return res.data?.data ?? []
 }

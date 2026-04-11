@@ -127,4 +127,9 @@ class AlunoService
             ]);
         }
     }
+
+    public static function listarTurmas(int $idaluno): array
+    {
+        return AlunoRepository::listarTurmas($idaluno);
+    }
 }
