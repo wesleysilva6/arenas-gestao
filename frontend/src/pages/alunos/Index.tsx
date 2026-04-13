@@ -34,6 +34,7 @@ import ConfirmarCancelamento from './components/ConfirmarCancelamento'
 import ResumoCards from './components/ResumoCards'
 import ModalTurmasAluno from './components/ModalTurmasAluno'
 import ModalPresencasAluno from './components/ModalPresencasAluno'
+import { formatPhone } from '../../utils/formatters'
 
 export default function Alunos() {
   const [alunos, setAlunos] = useState<Aluno[]>([])
@@ -77,7 +78,8 @@ export default function Alunos() {
   const alunosFiltrados = alunos.filter((a) => {
     const matchBusca =
       a.nome.toLowerCase().includes(busca.toLowerCase()) ||
-      a.telefone.includes(busca) ||
+      a.telefone.includes(busca.replace(/\D/g, '')) ||
+      formatPhone(a.telefone).includes(busca) ||
       a.modalidade_nome.toLowerCase().includes(busca.toLowerCase())
     const matchSituacao = filtroSituacao === '' || String(a.situacao) === filtroSituacao
     const matchModalidade = filtroModalidade === '' || String(a.modalidade_id) === filtroModalidade

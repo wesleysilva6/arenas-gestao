@@ -20,6 +20,6 @@ class LoginRepository
             return null;
         }
         
-        return $res['retorno'] ?? null;
+        return $res['retorno'] ?: null;
     }
 }

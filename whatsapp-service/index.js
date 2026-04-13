@@ -4,6 +4,7 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   DisconnectReason,
+  fetchLatestWaWebVersion,
 } = require('@whiskeysockets/baileys')
 const QRCode = require('qrcode')
 const pino = require('pino')
@@ -32,11 +33,20 @@ function broadcast(data) {
 async function connectWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR)
 
+  const { version } = await fetchLatestWaWebVersion()
+  console.log(`Usando WhatsApp Web versão: ${version.join('.')}`)
+
   sock = makeWASocket({
+    version,
     auth: state,
     printQRInTerminal: false,
     logger: pino({ level: 'silent' }),
-    browser: ['Arenas Gestão', 'Chrome', '10.0'],
+    browser: ['Ubuntu', 'Chrome', '120.0.5481.177'],
+    connectTimeoutMs: 60000,
+    keepAliveIntervalMs: 25000,
+    retryRequestDelayMs: 500,
+    generateHighQualityLinkPreview: false,
+    syncFullHistory: false,
   })
 
   sock.ev.on('creds.update', saveCreds)
@@ -65,11 +75,14 @@ async function connectWhatsApp() {
 
     if (connection === 'close') {
       const statusCode = lastDisconnect?.error?.output?.statusCode
+      const errorMessage = lastDisconnect?.error?.message || 'sem detalhes'
       const shouldReconnect = statusCode !== DisconnectReason.loggedOut
       connectionStatus = 'disconnected'
       qrDataUrl = null
       connectedNumber = null
       broadcast({ type: 'status', status: 'disconnected' })
+
+      console.log(`Conexão encerrada. StatusCode: ${statusCode} | Erro: ${errorMessage}`)
 
       if (shouldReconnect) {
         console.log('Reconectando WhatsApp...')

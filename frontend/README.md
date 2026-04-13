@@ -1,126 +1,177 @@
-# Arenas Gestão - Frontend React
+# Arenas Gestão — Frontend
 
-## Sobre o Projeto
-
-Aplicação web desenvolvida em React com TypeScript utilizando Vite, com foco em gestão operacional da Arena Fitway. Consome a API RESTful do backend via camada de serviços centralizada.
+Aplicação web SPA desenvolvida em React 19 com TypeScript, Vite e Chakra UI para gestão de arenas esportivas. Consome a API RESTful do backend e integra com o serviço WhatsApp.
 
 ## Arquitetura
 
-O projeto utiliza uma **arquitetura em camadas** com separação de responsabilidades:
-
-- **Pages**: Camada de apresentação, responsável pela interface e interação do usuário
-- **Service**: Camada de acesso à API, responsável por todas as requisições HTTP ao backend
-- **Utils**: Funções utilitárias reutilizáveis (alertas, formatações, etc.)
-- **Theme**: Customização global do design system (Chakra UI)
-- **Layouts**: Componentes estruturais de layout (autenticado e protegido)
-
-## Padrões de Projeto Utilizados
-
-- **Service Layer**: Centralização de todas as requisições HTTP na pasta `service/`
-- **Protected Routes**: Validação do token JWT antes de renderizar rotas privadas
-- **Layout Pattern**: Layouts reutilizáveis separados por contexto (`AuthLayout`, `ProtectedLayout`)
-- **Component Composition**: Composição de componentes via `<Outlet />` do React Router
-
-## Estrutura de Pastas
-
 ```
 src/
-├── pages/                  # Páginas da aplicação (uma pasta por módulo)
-│   ├── home/               # Página principal / dashboard
-│   └── login/              # Página de autenticação
-├── service/                # Requisições HTTP para a API
-│   ├── http.ts             # Instância do Axios, token e validação JWT
-│   ├── auth.ts             # Funções de autenticação (login, logout)
-│   └── dashboard.ts        # Funções de requisição do módulo dashboard
-├── theme/
-│   └── index.ts            # Tema global do Chakra UI (cores, fontes, etc.)
+├── pages/                  # Páginas organizadas por módulo
+│   ├── dashboard/          # Painel com métricas e vencimentos
+│   ├── alunos/             # CRUD de alunos (7 componentes)
+│   ├── modalidades/        # CRUD de modalidades
+│   ├── turmas/             # CRUD de turmas + matrícula
+│   ├── mensalidades/       # Gestão de mensalidades
+│   ├── gastos/             # Controle de despesas
+│   ├── presencas/          # Controle de presenças
+│   ├── mensagens/          # Envio de mensagens WhatsApp
+│   ├── notificacoes/       # Centro de notificações
+│   ├── configuracoes/      # Perfil e segurança
+│   └── login/              # Autenticação
+├── components/             # Componentes globais
+│   ├── Sidebar.tsx         # Menu lateral com navegação
+│   ├── Topbar.tsx          # Barra superior com notificações
+│   └── AppLayout.tsx       # Layout principal (Sidebar + Topbar + Outlet)
+├── contexts/               # Contextos React
+│   ├── AuthContext.tsx     # Autenticação JWT (login, logout, user)
+│   └── NotificacoesContext.tsx  # Notificações em tempo real
+├── service/                # Camada HTTP — única responsável por acessar a API
+│   ├── http.ts             # Instância Axios, token JWT, interceptors
+│   ├── auth.ts             # Login
+│   ├── dashboard.ts        # Dados do dashboard
+│   ├── alunos.ts           # CRUD alunos + modalidades
+│   ├── modalidades.ts      # CRUD modalidades
+│   ├── turmas.ts           # CRUD turmas + matrícula
+│   ├── mensalidades.ts     # Mensalidades + geração
+│   ├── gastos.ts           # CRUD gastos + resumo
+│   ├── presencas.ts        # Presenças por turma/aluno
+│   ├── mensagens.ts        # Mensagens + grupos WhatsApp
+│   ├── usuario.ts          # Perfil + alteração de senha
+│   └── whatsapp.ts         # Cliente SSE do WhatsApp Service
 ├── utils/
-│   └── alertas.ts          # Funções utilitárias de alertas e notificações
-├── AuthLayout.tsx          # Layout para páginas públicas (login)
-├── ProtectedLayout.tsx     # Layout para páginas protegidas (valida JWT)
-├── App.tsx                 # Definição de rotas da aplicação
-└── main.tsx                # Entry point da aplicação
+│   ├── formatters.ts       # Formatação de CPF, telefone, moeda, data
+│   ├── alertas.ts          # Alertas e confirmações (SweetAlert2)
+│   └── types.ts            # Tipos compartilhados
+├── theme/
+│   └── index.ts            # Tema Chakra UI (cor brand: #1890FF)
+├── AuthLayout.tsx          # Layout para rotas públicas
+├── ProtectedLayout.tsx     # Layout protegido (valida JWT)
+├── App.tsx                 # Definição de rotas
+└── main.tsx                # Entry point
 ```
 
-## Camada de Service
+### Padrões utilizados
 
-A pasta `service/` é a única responsável por se comunicar com a API. Nenhuma página deve fazer requisições diretamente.
-
-| Arquivo        | Responsabilidade                                          |
-|----------------|-----------------------------------------------------------|
-| `http.ts`      | Configuração do Axios, helpers de token (get/set/remove/validate) |
-| `auth.ts`      | Funções de login e logout                                 |
-| `dashboard.ts` | Funções de requisição do módulo dashboard                 |
-
-> Ao criar um novo módulo, crie o arquivo de service correspondente na pasta `service/` (ex.: `procedimento.ts`).
+- **Service Layer** — toda comunicação HTTP centralizada em `service/`
+- **Protected Routes** — `ProtectedLayout` valida JWT antes de renderizar
+- **Component Composition** — cada página composta por componentes na pasta `components/`
+- **Context API** — estado global de autenticação e notificações
+- **Formatters centralizados** — `utils/formatters.ts` com máscaras de CPF, telefone e moeda
 
 ## Tecnologias
 
-- **React 18** com **TypeScript**
-- **Vite**: Build tool e servidor de desenvolvimento
-- **Chakra UI**: Design system e componentes visuais
-- **React Router DOM**: Gerenciamento de rotas
-- **Axios**: Cliente HTTP para requisições à API
-- **Docker & Docker Compose**: Containerização
-
-## Fluxo de Autenticação
-
-1. Usuário preenche e-mail e senha na página `/login`
-2. `auth.ts` envia `POST /login` para a API
-3. A API retorna o token JWT, que é armazenado via `http.ts`
-4. Ao navegar para rotas protegidas, `ProtectedLayout` valida o token
-5. Se o token for inválido ou expirado, o usuário é redirecionado para `/login`
+| Tecnologia | Uso |
+|-----------|-----|
+| React 19 | Framework UI |
+| TypeScript 5.9 | Tipagem estática |
+| Vite 7 | Build tool e dev server |
+| Chakra UI 2 | Design system e componentes |
+| React Router 7 | Roteamento SPA |
+| Axios | Cliente HTTP |
+| Framer Motion | Animações |
+| ExcelJS | Exportação para Excel |
+| jsPDF | Geração de PDFs |
+| date-fns | Manipulação de datas |
+| SweetAlert2 | Alertas e confirmações |
 
 ## Rotas da Aplicação
 
-### Rotas Públicas
+### Públicas
 
-| Rota     | Componente  | Descrição               |
-|----------|-------------|-------------------------|
-| `/`      | `Login`     | Redireciona para login  |
-| `/login` | `Login`     | Página de autenticação  |
+| Rota | Página | Descrição |
+|------|--------|-----------|
+| `/` | Login | Redirecionamento para login |
+| `/login` | Login | Autenticação com email e senha |
 
-### Rotas Protegidas (requerem JWT válido)
+### Protegidas (requerem JWT válido)
 
-| Rota         | Componente    | Descrição               |
-|--------------|---------------|-------------------------|
-| `/dashboard` | `Dashboard`   | Painel principal        |
+| Rota | Página | Descrição |
+|------|--------|-----------|
+| `/dashboard` | Dashboard | Métricas, receita, vencimentos |
+| `/alunos` | Alunos | Cadastro e gestão de alunos |
+| `/modalidades` | Modalidades | Gerenciamento de modalidades |
+| `/turmas` | Turmas | Turmas, horários e matrículas |
+| `/mensalidades` | Mensalidades | Cobrança e confirmação de pagamento |
+| `/gastos` | Gastos | Registro de despesas por categoria |
+| `/presencas` | Presenças | Controle de frequência |
+| `/mensagens` | Mensagens | Envio WhatsApp individual/em massa |
+| `/notificacoes` | Notificações | Alertas de vencimentos e pendências |
+| `/configuracoes` | Configurações | Perfil, email e senha |
+
+## Camada de Service
+
+Nenhuma página faz requisições HTTP diretamente. Toda comunicação passa pela pasta `service/`:
+
+| Arquivo | Responsabilidade |
+|---------|-----------------|
+| `http.ts` | Instância Axios, JWT helpers (save/get/clear/validate), interceptors |
+| `auth.ts` | `POST /login` |
+| `dashboard.ts` | `GET /dashboard` |
+| `alunos.ts` | CRUD alunos, listagem de modalidades, turmas por aluno |
+| `modalidades.ts` | CRUD modalidades, toggle status |
+| `turmas.ts` | CRUD turmas, matrícula/remoção de alunos |
+| `mensalidades.ts` | Listagem, confirmação, geração mensal |
+| `gastos.ts` | CRUD gastos, resumo mensal por categoria |
+| `presencas.ts` | Listagem por turma/aluno, marcação de presença |
+| `mensagens.ts` | Histórico, envio, grupos WhatsApp, templates |
+| `usuario.ts` | Perfil, atualização de dados, alteração de senha |
+| `whatsapp.ts` | SSE (status/QR), connect, disconnect, send, send-bulk |
+
+## Formatadores (`utils/formatters.ts`)
+
+| Função | Descrição | Exemplo |
+|--------|-----------|---------|
+| `formatCurrency(value)` | Exibição de moeda | `R$ 1.234,56` |
+| `maskCurrency(value)` | Máscara de input monetário | `1.234,56` |
+| `unmaskCurrency(value)` | Converte máscara para `number` | `1234.56` |
+| `formatCPF(cpf)` | Exibição de CPF | `123.456.789-00` |
+| `maskCPF(value)` | Máscara de input CPF | `123.456.789-00` |
+| `unmaskCPF(value)` | Remove máscara | `12345678900` |
+| `formatPhone(phone)` | Exibição de telefone | `(11) 99999-0000` |
+| `maskPhone(value)` | Máscara de input telefone | `(11) 99999-0000` |
+| `unmaskPhone(value)` | Remove máscara | `11999990000` |
+| `formatDate(dateStr)` | Exibição de data | `12/04/2026` |
+
+## Fluxo de Autenticação
+
+1. Usuário envia email + senha em `/login`
+2. `auth.ts` faz `POST /login` → backend retorna JWT
+3. Token salvo no localStorage via `http.ts`
+4. `ProtectedLayout` valida o token a cada navegação
+5. Token expirado → redirecionamento automático para `/login`
+6. Axios interceptor injeta `Authorization: Bearer <token>` em todas as requisições
 
 ## Como Executar
 
-### Pré-requisitos
-
-- Docker
-- Docker Compose
-
-### Configuração
-
-1. Configure as variáveis de ambiente:
-```bash
-cp .env.example .env
-```
-
-2. Ajuste a URL da API no `.env`:
-```env
-VITE_API_BASE_URL=http://localhost:8085
-```
-
-3. Execute com Docker:
-```bash
-docker-compose up -d
-```
-
-A aplicação estará disponível em `http://localhost:5173`
-
-### Desenvolvimento local (sem Docker)
+### Desenvolvimento local
 
 ```bash
-npm install
-npm run dev
+cd frontend
+npm install       # ou yarn install
+npm run dev       # http://localhost:5173
 ```
+
+### Produção com Docker
+
+```bash
+cd frontend
+docker compose up -d    # http://localhost:3000
+```
+
+### Scripts disponíveis
+
+| Script | Descrição |
+|--------|-----------|
+| `npm run dev` | Servidor de desenvolvimento (Vite) |
+| `npm run build` | Build de produção |
+| `npm run preview` | Preview do build |
+| `npm run lint` | Verificação ESLint |
+| `npm run lint:fix` | Correção automática ESLint |
+| `npm run format` | Formatação Prettier |
 
 ## Variáveis de Ambiente
 
-| Variável           | Descrição                    | Exemplo                    |
-|--------------------|------------------------------|----------------------------|
-| `VITE_API_BASE_URL`| URL base da API backend      | `http://localhost:8085`    |
+| Variável | Descrição | Padrão |
+|----------|-----------|--------|
+| `VITE_API_BASE_URL` | URL da API backend | `http://localhost:8085` |
+| `VITE_WA_BASE_URL` | URL do WhatsApp Service | `http://localhost:3001` |

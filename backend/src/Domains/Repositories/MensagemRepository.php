@@ -40,6 +40,12 @@ class MensagemRepository
         return $res['retorno'] ?? [];
     }
 
+    public static function limparHistorico(): array
+    {
+        $res = Database::switchParams([], 'mensagem/limpar_historico', true);
+        return $res['retorno'] ?? [];
+    }
+
     public static function cadastrar(array $dados): array
     {
         $res = Database::switchParams($dados, 'mensagem/cadastrar', true);

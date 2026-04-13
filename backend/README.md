@@ -1,90 +1,219 @@
-# Controle Gastos - API PHP com Slim Framework
+# Arenas Gestão — Backend API
 
-## Sobre o Projeto
-
-API RESTful desenvolvida em PHP utilizando o framework Slim 4, com arquitetura limpa e padrões de desenvolvimento modernos.
+API RESTful desenvolvida em PHP 8.2 com Slim Framework 4, PostgreSQL 15 e Docker.
 
 ## Arquitetura
 
-O projeto utiliza uma **arquitetura em camadas** com separação de responsabilidades:
-
-- **Controllers**: Camada de apresentação, responsável pelo recebimento e resposta de requisições HTTP
-- **Services**: Camada de aplicação, contém a lógica de negócio
-- **Repositories**: Camada de dados, responsável pelo acesso ao banco de dados
-- **Infrastructures**: Configurações e recursos de infraestrutura
-
-## Padrões de Projeto Utilizados
-
-- **Service Layer**: Centralização da lógica de negócio
-- **Repository Pattern**: Encapsulamento da lógica de acesso a dados
-- **Singleton**: Para conexão com banco de dados
-- **Factory Pattern**: Criação da aplicação Slim
-- **PSR-4**: Autoload de classes seguindo padrões PSR
-
-## Estrutura de Pastas
+O projeto segue uma **arquitetura em camadas** com separação clara de responsabilidades:
 
 ```
 src/
-├── Controllers/           # Controladores da aplicação
+├── Controllers/           # Recebimento de requisições HTTP e respostas
 ├── Domains/
-│   ├── Repositories/      # Contratos e implementações de repositórios
-│   ├── Services/          # Serviços com lógica de negócio
-│   └── SQL/              # Queries SQL
+│   ├── Repositories/      # Acesso ao banco de dados (static methods)
+│   ├── Services/          # Lógica de negócio e validações
+│   └── SQL/               # Queries SQL organizadas por módulo
+│       ├── aluno/
+│       ├── dashboard/
+│       ├── gasto/
+│       ├── login/
+│       ├── mensagem/
+│       ├── mensalidade/
+│       ├── modalidade/
+│       ├── presenca/
+│       ├── turma/
+│       └── usuario/
 ├── Infrastructures/
-│   └── Config/           # Configurações da aplicação
-├── Adapters/
-│   ├── Controllers/      # Adaptadores de controladores
-│   └── Middlewares/      # Middlewares personalizados
-└── routes.php            # Definição das rotas
+│   ├── Config/            # Database, conexão PDO
+│   └── Middleware/         # JwtAuthMiddleware
+└── routes.php             # Definição de todas as rotas
 ```
+
+### Padrões utilizados
+
+- **Service Layer** — lógica de negócio centralizada nos Services
+- **Repository Pattern** — queries SQL em arquivos `.sql` separados, executados via `Database::switchParams()`
+- **JWT Auth** — autenticação via `firebase/php-jwt` com middleware
+- **PSR-4 Autoload** — carregamento automático de classes via Composer
 
 ## Tecnologias
 
-- **PHP 8+**
-- **Slim Framework 4**: Micro framework para APIs
-- **PostgreSQL**: Banco de dados relacional
-- **Docker & Docker Compose**: Containerização
-- **PSR-7**: HTTP message interfaces
-- **DotEnv**: Gerenciamento de variáveis de ambiente
+| Tecnologia | Versão | Uso |
+|-----------|--------|-----|
+| PHP | 8.2 | Linguagem principal |
+| Slim Framework | 4 | Micro framework HTTP |
+| PostgreSQL | 15 | Banco de dados |
+| Firebase PHP-JWT | — | Autenticação JWT |
+| Docker | — | Containerização |
+| Composer | — | Gerenciamento de dependências |
+
+## Endpoints da API
+
+### Públicos
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| POST | `/login` | Autenticação (retorna JWT) |
+
+### Protegidos (requerem `Authorization: Bearer <token>`)
+
+#### Dashboard
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/dashboard` | Dados resumidos do painel |
+
+#### Alunos
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/alunos` | Listar alunos |
+| GET | `/alunos/{id}` | Buscar aluno por ID |
+| POST | `/alunos` | Cadastrar aluno |
+| PUT | `/alunos/{id}` | Editar aluno |
+| DELETE | `/alunos/{id}` | Excluir aluno |
+| PATCH | `/alunos/{id}/cancelar` | Cancelar aluno |
+| GET | `/alunos/{id}/turmas` | Turmas do aluno |
+| GET | `/alunos/modalidades` | Modalidades para formulário |
+
+#### Modalidades
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/modalidades` | Listar modalidades |
+| POST | `/modalidades` | Cadastrar modalidade |
+| PUT | `/modalidades/{id}` | Editar modalidade |
+| PATCH | `/modalidades/{id}/status` | Ativar/desativar |
+
+#### Turmas
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/turmas` | Listar turmas |
+| POST | `/turmas` | Cadastrar turma |
+| PUT | `/turmas/{id}` | Editar turma |
+| PATCH | `/turmas/{id}/status` | Ativar/desativar |
+| GET | `/turmas/{id}/alunos` | Alunos da turma |
+| GET | `/turmas/{id}/alunos-disponiveis` | Alunos disponíveis |
+| POST | `/turmas/{id}/alunos` | Matricular aluno |
+| DELETE | `/turmas/{id}/alunos/{aluno_id}` | Remover aluno |
+
+#### Mensalidades
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/mensalidades` | Listar mensalidades |
+| PATCH | `/mensalidades/{id}/confirmar` | Confirmar pagamento |
+| POST | `/mensalidades/gerar` | Gerar mensalidades do mês |
+| GET | `/mensalidades/sem-mensalidade` | Alunos sem mensalidade |
+
+#### Gastos
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/gastos` | Listar gastos |
+| POST | `/gastos` | Cadastrar gasto |
+| PUT | `/gastos/{id}` | Editar gasto |
+| DELETE | `/gastos/{id}` | Excluir gasto |
+| GET | `/gastos/resumo` | Resumo mensal por categoria |
+
+#### Presenças
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/presencas/turmas` | Turmas para controle |
+| GET | `/presencas/aluno/{id}` | Presenças do aluno |
+| PATCH | `/presencas/{id}/marcar` | Marcar presença |
+
+#### Mensagens
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/mensagens/historico` | Histórico de mensagens |
+| DELETE | `/mensagens/historico` | Limpar histórico |
+| GET | `/mensagens/alunos-turma-map` | Mapeamento aluno-turma |
+| POST | `/mensagens` | Registrar mensagem |
+
+#### Grupos WhatsApp
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/grupos-whatsapp` | Listar grupos |
+| POST | `/grupos-whatsapp` | Cadastrar grupo |
+| PUT | `/grupos-whatsapp/{id}` | Editar grupo |
+| DELETE | `/grupos-whatsapp/{id}` | Excluir grupo |
+
+#### Usuário
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/usuario/perfil` | Buscar perfil |
+| PUT | `/usuario/dados` | Atualizar nome/email |
+| POST | `/usuario/verificar-senha` | Verificar senha atual |
+| PUT | `/usuario/senha` | Alterar senha |
 
 ## Como Executar
 
 ### Pré-requisitos
 
-- Docker
-- Docker Compose
+- Docker e Docker Compose
 
 ### Configuração
 
-1. Clone o repositório:
 ```bash
-git clone <repository-url>
 cd backend
+cp .env.example .env     # Configure as variáveis
+docker compose up -d     # Inicia PHP + PostgreSQL
 ```
 
-2. Configure as variáveis de ambiente:
+Na primeira execução, importe o schema:
+
 ```bash
-cp .env.example .env
+docker exec -i backend-postgres psql -U postgres -d arenas_gestao < banco.sql
 ```
 
-3. Execute com Docker:
-```bash
-docker-compose up -d
-```
+A API estará disponível em `http://localhost:8085`.
 
-4. Entre no container e instale as dependências:
-```bash
-docker exec -it php bash
-composer install -o
-```
+### Variáveis de Ambiente
 
-A API estará disponível em `http://localhost:8085`
-
-### Endpoints Disponíveis
-
-- `GET /check` - Health check da aplicação
+| Variável | Descrição | Exemplo |
+|----------|-----------|---------|
+| `DB_HOST` | Host do PostgreSQL | `postgres` |
+| `DB_PORT` | Porta do PostgreSQL | `5432` |
+| `DB_NAME` | Nome do banco | `arenas_gestao` |
+| `DB_USER` | Usuário do banco | `postgres` |
+| `DB_PASSWORD` | Senha do banco | `postgres` |
+| `DB_DRIVER` | Driver PDO | `pgsql` |
+| `APP_NAME` | Nome da aplicação | `ArenaFitway` |
+| `APP_ENV` | Ambiente | `development` |
+| `CORS_ALLOWED_ORIGINS` | Origens CORS | `*` |
 
 ### Desenvolvimento
 
-Para desenvolvimento local, o container PHP está configurado com volume compartilhado, permitindo alterações em tempo real.
+O container monta o diretório `src/` como volume — alterações no código são refletidas imediatamente sem rebuild.
+
+Para rebuild após mudanças no Dockerfile:
+
+```bash
+docker compose up -d --build
+```
+
+## Padrão de Resposta
+
+Todas as respostas seguem o formato:
+
+```json
+{
+  "success": true,
+  "data": [ ... ]
+}
+```
+
+Em caso de erro:
+
+```json
+{
+  "error": "Mensagem de erro"
+}
+```
  

@@ -16,7 +16,7 @@ import {
   Tr,
 } from '@chakra-ui/react'
 import { FiEdit2, FiBarChart2, FiLayers, FiTrash2, FiUsers, FiXCircle } from 'react-icons/fi'
-import { formatCurrency } from '../../../utils/formatters'
+import { formatCurrency, formatPhone } from '../../../utils/formatters'
 import type { Aluno } from '../../../service/alunos'
 
 interface Props {
@@ -86,7 +86,7 @@ export default function TabelaAlunos({ alunos, loading, onEditar, onDeletar, onC
                 </HStack>
               </Td>
               <Td>
-                <Text fontSize="sm" color="gray.600">{aluno.telefone}</Text>
+                <Text fontSize="sm" color="gray.600">{formatPhone(aluno.telefone)}</Text>
               </Td>
               <Td>
                 <Badge colorScheme="purple" rounded="full" px={2} fontSize="xs">

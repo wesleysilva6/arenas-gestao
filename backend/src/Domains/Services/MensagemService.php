@@ -35,6 +35,11 @@ class MensagemService
         return MensagemRepository::listarHistorico();
     }
 
+    public static function limparHistorico(): array
+    {
+        return MensagemRepository::limparHistorico();
+    }
+
     public static function cadastrar(array $dados): array
     {
         return MensagemRepository::cadastrar($dados);

@@ -14,6 +14,7 @@ import {
   FiGrid,
   FiLayers,
   FiDollarSign,
+  FiTrendingDown,
   FiCheckSquare,
   FiMessageSquare,
   FiBell,
@@ -30,11 +31,12 @@ interface NavItem {
 }
 
 const mainNav: NavItem[] = [
-  { label: 'Dashboard', icon: FiHome, path: '/' },
+  { label: 'Dashboard', icon: FiHome, path: '/dashboard' },
   { label: 'Alunos', icon: FiUsers, path: '/alunos' },
   { label: 'Modalidades', icon: FiGrid, path: '/modalidades' },
   { label: 'Turmas', icon: FiLayers, path: '/turmas' },
   { label: 'Mensalidades', icon: FiDollarSign, path: '/mensalidades' },
+  { label: 'Gastos', icon: FiTrendingDown, path: '/gastos' },
   { label: 'Presenças', icon: FiCheckSquare, path: '/presencas' },
 ]
 

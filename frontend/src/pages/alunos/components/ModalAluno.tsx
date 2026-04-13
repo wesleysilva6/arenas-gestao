@@ -18,6 +18,7 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import type { Aluno, Modalidade } from '../../../service/alunos'
+import { maskPhone, unmaskPhone, maskCPF, unmaskCPF, maskCurrency, unmaskCurrency } from '../../../utils/formatters'
 
 interface Props {
   isOpen: boolean
@@ -50,11 +51,17 @@ export default function ModalAluno({ isOpen, onClose, onSalvar, aluno, modalidad
 
   useEffect(() => {
     if (aluno) {
-      setForm({ ...aluno })
+      setForm({
+        ...aluno,
+        telefone: aluno.telefone || '',
+        cpf: aluno.cpf || '',
+      })
     } else {
       setForm({
         nome: '',
         telefone: '',
+        cpf: '',
+        data_nascimento: '',
         modalidade_id: undefined,
         data_inicio: '',
         dia_vencimento: 10,
@@ -81,7 +88,15 @@ export default function ModalAluno({ isOpen, onClose, onSalvar, aluno, modalidad
   }
 
   const handleSubmit = async () => {
-    await onSalvar(form)
+    const dados = {
+      ...form,
+      telefone: unmaskPhone(form.telefone ?? ''),
+      cpf: form.cpf ? unmaskCPF(form.cpf) : '',
+      valor_mensalidade: typeof form.valor_mensalidade === 'string'
+        ? unmaskCurrency(form.valor_mensalidade as string)
+        : form.valor_mensalidade,
+    }
+    await onSalvar(dados)
   }
 
   return (
@@ -111,9 +126,35 @@ export default function ModalAluno({ isOpen, onClose, onSalvar, aluno, modalidad
               <FormControl isRequired>
                 <FormLabel fontSize="sm" fontWeight="600">Telefone</FormLabel>
                 <Input
-                  value={form.telefone ?? ''}
-                  onChange={(e) => handleChange('telefone', e.target.value)}
+                  value={maskPhone(form.telefone ?? '')}
+                  onChange={(e) => handleChange('telefone', maskPhone(e.target.value))}
                   placeholder="(00) 00000-0000"
+                  maxLength={15}
+                  size="lg"
+                  rounded="xl"
+                  bg="gray.50"
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="600">CPF</FormLabel>
+                <Input
+                  value={maskCPF(form.cpf ?? '')}
+                  onChange={(e) => handleChange('cpf', maskCPF(e.target.value))}
+                  placeholder="000.000.000-00"
+                  maxLength={14}
+                  size="lg"
+                  rounded="xl"
+                  bg="gray.50"
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="sm" fontWeight="600">Data de Nascimento</FormLabel>
+                <Input
+                  type="date"
+                  value={form.data_nascimento ?? ''}
+                  onChange={(e) => handleChange('data_nascimento', e.target.value)}
                   size="lg"
                   rounded="xl"
                   bg="gray.50"
@@ -158,10 +199,11 @@ export default function ModalAluno({ isOpen, onClose, onSalvar, aluno, modalidad
               <FormControl isRequired>
                 <FormLabel fontSize="sm" fontWeight="600">Valor Mensalidade</FormLabel>
                 <Input
-                  type="number"
-                  step="0.01"
-                  value={form.valor_mensalidade ?? 0}
-                  onChange={(e) => handleChange('valor_mensalidade', parseFloat(e.target.value))}
+                  value={typeof form.valor_mensalidade === 'number' && form.valor_mensalidade > 0
+                    ? maskCurrency(String(Math.round(form.valor_mensalidade * 100)))
+                    : (form.valor_mensalidade as any) ?? ''}
+                  onChange={(e) => handleChange('valor_mensalidade', e.target.value ? maskCurrency(e.target.value) : '')}
+                  placeholder="0,00"
                   size="lg"
                   rounded="xl"
                   bg="gray.50"

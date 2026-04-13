@@ -26,15 +26,12 @@ import {
 import { FiAlertTriangle, FiCalendar, FiCheck, FiCheckCircle, FiClock, FiDollarSign } from 'react-icons/fi'
 import type { Mensalidade } from '../../../service/mensalidades'
 import { formatMesReferencia } from '../../../service/mensalidades'
+import { formatCurrency } from '../../../utils/formatters'
 
 interface Props {
   mensalidades: Mensalidade[]
   loading: boolean
   onConfirmarPagamento: (m: Mensalidade) => void
-}
-
-function formatCurrency(value: number) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 function formatDate(date: string | null) {

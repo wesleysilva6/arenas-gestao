@@ -21,6 +21,8 @@ class AlunoService
         $result = AlunoRepository::cadastrar([
             'nome' => $dados['nome'],
             'telefone' => $dados['telefone'],
+            'cpf' => $dados['cpf'] ?? null,
+            'data_nascimento' => $dados['data_nascimento'] ?? null,
             'modalidade_id' => (int) $dados['modalidade_id'],
             'data_inicio' => $dados['data_inicio'] ?? null,
             'dia_vencimento' => (int) $dados['dia_vencimento'],
@@ -53,6 +55,8 @@ class AlunoService
             'idaluno' => $idaluno,
             'nome' => $dados['nome'],
             'telefone' => $dados['telefone'],
+            'cpf' => $dados['cpf'] ?? null,
+            'data_nascimento' => $dados['data_nascimento'] ?? null,
             'modalidade_id' => (int) $dados['modalidade_id'],
             'data_inicio' => $dados['data_inicio'] ?? null,
             'dia_vencimento' => (int) $dados['dia_vencimento'],

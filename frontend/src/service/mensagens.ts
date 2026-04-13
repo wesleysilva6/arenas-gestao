@@ -31,12 +31,19 @@ export interface AlunoMsg {
   modalidade_id: number
   modalidade_nome: string
   situacao: number
+  dia_vencimento: number
+  valor_mensalidade: number
+  cpf: string | null
+  data_nascimento: string | null
+  data_vencimento_contrato: string | null
 }
 
 export interface TurmaMsg {
   idturma: number
   nome: string
   modalidade_nome: string
+  horario: string
+  dias_semana: string
   situacao: number
 }
 
@@ -60,14 +67,18 @@ export async function carregarDadosMensagens() {
 
   const alunosRaw = alunosRes.data?.data ?? alunosRes.data ?? []
   const turmasRaw = turmasRes.data?.data ?? turmasRes.data ?? []
+  const modalidadesRaw = modalidadesRes.data?.data ?? modalidadesRes.data ?? []
+  const mapaRaw = mapaRes.data?.data ?? mapaRes.data ?? []
+  const gruposRaw = gruposRes.data?.data ?? gruposRes.data ?? []
+  const historicoRaw = historicoRes.data?.data ?? historicoRes.data ?? []
 
   return {
     alunos: (alunosRaw as AlunoMsg[]).filter((a) => a.situacao === 1),
     turmas: (turmasRaw as TurmaMsg[]).filter((t) => t.situacao === 1),
-    modalidades: (modalidadesRes.data ?? []) as ModalidadeMsg[],
-    alunosTurmaMap: (mapaRes.data ?? []) as AlunoTurmaMap[],
-    grupos: (gruposRes.data ?? []) as GrupoWhatsApp[],
-    historico: (historicoRes.data ?? []) as MensagemLog[],
+    modalidades: (modalidadesRaw as ModalidadeMsg[]),
+    alunosTurmaMap: (mapaRaw as AlunoTurmaMap[]),
+    grupos: (gruposRaw as GrupoWhatsApp[]),
+    historico: (historicoRaw as MensagemLog[]),
   }
 }
 
@@ -89,6 +100,10 @@ export async function deletarGrupo(id: number): Promise<void> {
 
 export async function registrarMensagem(dados: { tipo: string; destino: string; mensagem: string }): Promise<void> {
   await http.post('/mensagens', dados)
+}
+
+export async function limparHistorico(): Promise<void> {
+  await http.delete('/mensagens/historico')
 }
 
 // ── Helpers WhatsApp ──

@@ -11,6 +11,8 @@ use App\Controllers\TurmaController;
 use App\Controllers\MensalidadeController;
 use App\Controllers\PresencaController;
 use App\Controllers\MensagemController;
+use App\Controllers\UsuarioController;
+use App\Controllers\GastoController;
 use App\Infrastructures\Middleware\JwtAuthMiddleware;
 
 // Rotas Públicas (sem autenticação)
@@ -60,6 +62,7 @@ $app->group('', function ($group) {
 
     // Mensagens
     $group->get('/mensagens/historico', MensagemController::class . ':listarHistorico');
+    $group->delete('/mensagens/historico', MensagemController::class . ':limparHistorico');
     $group->get('/mensagens/alunos-turma-map', MensagemController::class . ':alunosTurmaMap');
     $group->post('/mensagens', MensagemController::class . ':cadastrar');
 
@@ -68,6 +71,19 @@ $app->group('', function ($group) {
     $group->post('/grupos-whatsapp', MensagemController::class . ':cadastrarGrupo');
     $group->put('/grupos-whatsapp/{id}', MensagemController::class . ':editarGrupo');
     $group->delete('/grupos-whatsapp/{id}', MensagemController::class . ':deletarGrupo');
+
+    // Usuário / Configurações
+    $group->get('/usuario/perfil', UsuarioController::class . ':perfil');
+    $group->put('/usuario/dados', UsuarioController::class . ':atualizarDados');
+    $group->post('/usuario/verificar-senha', UsuarioController::class . ':verificarSenha');
+    $group->put('/usuario/senha', UsuarioController::class . ':alterarSenha');
+
+    // Gastos
+    $group->get('/gastos', GastoController::class . ':listar');
+    $group->post('/gastos', GastoController::class . ':cadastrar');
+    $group->put('/gastos/{id}', GastoController::class . ':editar');
+    $group->delete('/gastos/{id}', GastoController::class . ':deletar');
+    $group->get('/gastos/resumo', GastoController::class . ':resumoMes');
 
     // Rotas Procedimento
     $group->get('/procedimento', ProcedimentoController::class . ':Listar');

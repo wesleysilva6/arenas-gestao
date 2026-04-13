@@ -1,6 +1,7 @@
 import { Box, Flex, Icon, Text } from '@chakra-ui/react'
 import { FiAlertTriangle, FiCalendar, FiCheckCircle, FiClock } from 'react-icons/fi'
 import { formatMesReferencia } from '../../../service/mensalidades'
+import { formatCurrency } from '../../../utils/formatters'
 
 interface Props {
   valorPendentes: number
@@ -11,10 +12,6 @@ interface Props {
   totalAtrasadas: number
   totalPagas: number
   mesAtual: string
-}
-
-function formatCurrency(value: number) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 export default function ResumoCards({

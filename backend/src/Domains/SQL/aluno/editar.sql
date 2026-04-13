@@ -1,6 +1,8 @@
 UPDATE aluno SET
     nome = :nome,
     telefone = :telefone,
+    cpf = :cpf,
+    data_nascimento = :data_nascimento,
     modalidade_id = :modalidade_id,
     data_inicio = :data_inicio,
     dia_vencimento = :dia_vencimento,

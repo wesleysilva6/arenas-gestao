@@ -8,6 +8,9 @@ import Turmas from './pages/turmas/Index';
 import Mensalidades from './pages/mensalidades/Index';
 import Presencas from './pages/presencas/Index';
 import Mensagens from './pages/mensagens/Index';
+import Notificacoes from './pages/notificacoes/Index';
+import Gastos from './pages/gastos/Index';
+import Configuracoes from './pages/configuracoes/Index';
 
 function App() {
   return (
@@ -24,8 +27,11 @@ function App() {
           <Route path="/modalidades" element={<Modalidades />} />
           <Route path="/turmas" element={<Turmas />} />
           <Route path="/mensalidades" element={<Mensalidades />} />
+          <Route path="/gastos" element={<Gastos />} />
           <Route path="/presencas" element={<Presencas />} />
           <Route path="/mensagens" element={<Mensagens />} />
+          <Route path="/notificacoes" element={<Notificacoes />} />
+          <Route path="/configuracoes" element={<Configuracoes />} />
         </Route>
       </Routes>
     </Router>

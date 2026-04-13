@@ -1,6 +1,8 @@
 INSERT INTO aluno (
     nome,
     telefone,
+    cpf,
+    data_nascimento,
     modalidade_id,
     data_inicio,
     dia_vencimento,
@@ -14,6 +16,8 @@ INSERT INTO aluno (
 ) VALUES (
     :nome,
     :telefone,
+    :cpf,
+    :data_nascimento,
     :modalidade_id,
     :data_inicio,
     :dia_vencimento,

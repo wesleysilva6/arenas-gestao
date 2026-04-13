@@ -4,6 +4,8 @@ export interface Aluno {
   idaluno: number
   nome: string
   telefone: string
+  cpf: string | null
+  data_nascimento: string | null
   modalidade_id: number
   modalidade_nome: string
   data_inicio: string | null

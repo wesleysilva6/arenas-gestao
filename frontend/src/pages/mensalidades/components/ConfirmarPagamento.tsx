@@ -13,6 +13,7 @@ import {
 import { FiCheck } from 'react-icons/fi'
 import type { Mensalidade } from '../../../service/mensalidades'
 import { formatMesReferencia } from '../../../service/mensalidades'
+import { formatCurrency } from '../../../utils/formatters'
 
 interface Props {
   isOpen: boolean
@@ -20,10 +21,6 @@ interface Props {
   onConfirmar: () => void
   mensalidade: Mensalidade | null
   confirmando: boolean
-}
-
-function formatCurrency(value: number) {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 export default function ConfirmarPagamento({ isOpen, onClose, onConfirmar, mensalidade, confirmando }: Props) {

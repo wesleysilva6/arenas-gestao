@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { getToken, isTokenValid } from './service/http';
 import { AuthProvider } from './contexts/AuthContext';
+import { NotificacoesProvider } from './contexts/NotificacoesContext';
 import AppLayout from './components/AppLayout';
 
 export default function ProtectedLayout() {
@@ -23,7 +24,9 @@ export default function ProtectedLayout() {
 
   return (
     <AuthProvider>
-      <AppLayout />
+      <NotificacoesProvider>
+        <AppLayout />
+      </NotificacoesProvider>
     </AuthProvider>
   );
 }

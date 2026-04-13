@@ -15,12 +15,12 @@ class DashboardRepository
     public static function buscarVencimentos(): array
     {
         $res = Database::switchParams([], 'dashboard/vencimentos', true);
-        return $res['retorno'] ?? [];
+        return $res['retorno'] ?: [];
     }
 
     public static function buscarTreinosHoje(): array
     {
         $res = Database::switchParams([], 'dashboard/treinos_hoje', true);
-        return $res['retorno'] ?? [];
+        return $res['retorno'] ?: [];
     }
 }

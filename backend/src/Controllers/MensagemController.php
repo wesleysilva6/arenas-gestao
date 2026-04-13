@@ -67,6 +67,13 @@ class MensagemController extends ControllerBase
         return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
 
+    public function limparHistorico(Request $request, Response $response): Response
+    {
+        MensagemService::limparHistorico();
+        $response->getBody()->write(json_encode(['ok' => true]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
+    }
+
     public function cadastrar(Request $request, Response $response): Response
     {
         $body = $request->getParsedBody() ?? [];

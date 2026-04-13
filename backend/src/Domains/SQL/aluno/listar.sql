@@ -2,6 +2,8 @@ SELECT
     a.idaluno,
     a.nome,
     a.telefone,
+    a.cpf,
+    a.data_nascimento,
     a.modalidade_id,
     m.nome AS modalidade_nome,
     a.data_inicio,
