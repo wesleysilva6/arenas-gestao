@@ -18,4 +18,4 @@ SELECT
     a.data_vencimento_contrato
 FROM aluno a
 JOIN modalidade m ON m.idmodalidade = a.modalidade_id
-ORDER BY a.nome ASC
+ORDER BY a.nome

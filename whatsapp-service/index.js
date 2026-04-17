@@ -102,9 +102,39 @@ function cleanAuth() {
 }
 
 function normalizePhone(phone) {
-  let digits = phone.replace(/\D/g, '')
-  if (!digits.startsWith('55')) digits = '55' + digits
+  let digits = String(phone || '').replace(/\D/g, '')
+
+  // Remove prefixes de discagem comuns como 00/0 antes do DDI/DDD.
+  digits = digits.replace(/^00/, '')
+
+  if (digits.startsWith('55')) {
+    digits = `55${digits.slice(2).replace(/^0+/, '')}`
+  } else {
+    digits = `55${digits.replace(/^0+/, '')}`
+  }
+
+  if (digits.length < 12 || digits.length > 13) {
+    throw new Error(`Telefone invalido para WhatsApp: ${phone}`)
+  }
+
   return digits
+}
+
+async function resolveWhatsAppJid(phone) {
+  const normalizedPhone = normalizePhone(phone)
+  const phoneJid = `${normalizedPhone}@s.whatsapp.net`
+
+  if (!sock?.onWhatsApp) {
+    return { normalizedPhone, jid: phoneJid }
+  }
+
+  const [result] = await sock.onWhatsApp(phoneJid)
+
+  if (result?.exists && result?.jid) {
+    return { normalizedPhone, jid: result.jid }
+  }
+
+  throw new Error(`Numero nao encontrado no WhatsApp: ${normalizedPhone}`)
 }
 
 // ── Express ──
@@ -149,9 +179,9 @@ app.post('/send', async (req, res) => {
   }
 
   try {
-    const jid = normalizePhone(phone) + '@s.whatsapp.net'
+    const { jid, normalizedPhone } = await resolveWhatsAppJid(phone)
     await sock.sendMessage(jid, { text: message })
-    res.json({ ok: true, to: jid })
+    res.json({ ok: true, to: jid, phone: normalizedPhone })
   } catch (err) {
     console.error('Erro ao enviar:', err.message)
     res.status(500).json({ error: err.message })
@@ -173,9 +203,9 @@ app.post('/send-bulk', async (req, res) => {
   const results = []
   for (const phone of contacts) {
     try {
-      const jid = normalizePhone(phone) + '@s.whatsapp.net'
+      const { jid, normalizedPhone } = await resolveWhatsAppJid(phone)
       await sock.sendMessage(jid, { text: message })
-      results.push({ phone, ok: true })
+      results.push({ phone: normalizedPhone, jid, ok: true })
       // delay between messages to avoid spam detection
       await new Promise((r) => setTimeout(r, 1500))
     } catch (err) {

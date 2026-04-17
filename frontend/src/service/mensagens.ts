@@ -109,8 +109,17 @@ export async function limparHistorico(): Promise<void> {
 // ── Helpers WhatsApp ──
 
 export function normalizeTelefone(tel: string): string {
-  const digits = tel.replace(/\D/g, '')
-  return digits.startsWith('55') ? digits : `55${digits}`
+  let digits = String(tel || '').replace(/\D/g, '')
+
+  digits = digits.replace(/^00/, '')
+
+  if (digits.startsWith('55')) {
+    digits = `55${digits.slice(2).replace(/^0+/, '')}`
+  } else {
+    digits = `55${digits.replace(/^0+/, '')}`
+  }
+
+  return digits
 }
 
 export function openWhatsApp(phone: string, message: string): void {
