@@ -219,7 +219,7 @@ export default function Login() {
         </Box>
 
         <Text mt={6} textAlign="center" fontSize="xs" color="gray.400">
-          © {new Date().getFullYear()} Arena Fitway. Todos os direitos reservados.
+          © {new Date().getFullYear()} NovaWave - Arena. Todos os direitos reservados.
         </Text>
       </Box>
     </AuthLayout>

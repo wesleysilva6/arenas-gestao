@@ -54,7 +54,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
 
           <VStack spacing={3} align="start">
             <Text textTransform="uppercase" letterSpacing="0.18em" fontSize="xs" fontWeight="700" color="whiteAlpha.800">
-              Arena Fitway
+              NovaWave - Arena
             </Text>
             <Heading size="2xl" lineHeight="1.1">
               Gestão simples para a operação do seu sistema.

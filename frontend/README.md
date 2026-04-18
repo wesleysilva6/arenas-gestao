@@ -1,4 +1,4 @@
-# Arenas Gestão — Frontend
+# NovaWave - Arena — Frontend
 
 Aplicação web SPA desenvolvida em React 19 com TypeScript, Vite e Chakra UI para gestão de arenas esportivas. Consome a API RESTful do backend e integra com o serviço WhatsApp.
 

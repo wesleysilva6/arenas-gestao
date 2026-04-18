@@ -1,4 +1,4 @@
-# Arenas Gestão — Backend API
+# NovaWave - Arena — Backend API
 
 API RESTful desenvolvida em PHP 8.2 com Slim Framework 4, PostgreSQL 15 e Docker.
 

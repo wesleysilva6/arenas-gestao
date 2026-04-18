@@ -1,6 +1,6 @@
 import { extendTheme } from '@chakra-ui/react';
 
-// Tema personalizado para o Arena Fitway - Gestão de Quadras de Beach Tennis
+// Tema personalizado para o NovaWave - Arena - Gestão de Quadras de Beach Tennis
 const theme = extendTheme({
   colors: {
     brand: {

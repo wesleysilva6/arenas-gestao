@@ -1,4 +1,4 @@
-# WhatsApp Service — Arenas Gestão
+# WhatsApp Service — NovaWave - Arena
 
 Microserviço Node.js responsável pelo envio de mensagens via WhatsApp, usando a biblioteca [Baileys](https://github.com/WhiskeySockets/Baileys).
 
